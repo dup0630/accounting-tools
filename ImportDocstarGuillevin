@@ -1,6 +1,6 @@
 Sub ImportDocstarGuillevin()
     Dim selectedFile As String
-    selectedFile = GetUserSelectedFile("Please select Docstar file:")
+    DOCSTAR = GetUserSelectedFile("Please select Docstar file:")
     
     ActiveWorkbook.Queries.Add Name:="DCSTR", Formula:= _
         "let" & _

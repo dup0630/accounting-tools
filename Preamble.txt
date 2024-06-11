@@ -1,14 +1,5 @@
 Option Explicit
 
-' CUSTOM TEMPLATE COLUMN NAMES
-Const INV_NUMBER As String = "Doc number"
-Const PO_NUMBER As String = "PO number"
-Const INV_DATE As String = "Date"
-Const WD_STATUS As String = "Workday status"
-Const DOCSTAR_WFS As String = "Docstar Workflow Step"
-Const AMOUNT_MATCH As String = "Amount match (Y/N)"
-Const NOTES As String = "Notes"
-
 Public Function GetFile(ByVal promptMessage As String) As String
     Dim filePath As Variant
     filePath = Application.GetOpenFilename("All Files,*.*", , promptMessage)

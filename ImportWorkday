@@ -1,4 +1,7 @@
 Sub ImportWorkday()
+    Dim selectedFile As String
+    WORKDAY = GetUserSelectedFile("Please select Docstar file:")
+
     Sheets("Workday").Select
     ActiveWorkbook.Queries.Add Name:="Rechercher des factures fournis", Formula:= _
         "let" & _

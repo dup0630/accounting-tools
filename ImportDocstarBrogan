@@ -1,4 +1,7 @@
 Sub ImportDocstarBrogan()
+    Dim selectedFile As String
+    DOCSTARBROGAN = GetUserSelectedFile("Please select Docstar file:")
+    
     ActiveWorkbook.Queries.Add Name:="DCSTRBRGN", Formula:= _
         "let" & _
         "    Source = Csv.Document(File.Contents(""" & DOCSTARBROGAN & """), " & _
