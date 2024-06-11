@@ -1,42 +1,49 @@
 Option Explicit
 
-' ********* ADD FILE PATHS **********
-Private Const DOCSTAR As String = "[CHEMIN CSV DOCSTAR GUILLEVIN]"
-Private Const WORKDAY As String = "[CHEMIN XLSX WORKDAY}"
-Private Const DOCSTARBROGAN As String = "[CHEMIN CSV DOCSTAR BROGAN]"
+' FILE PATHS
+Const WORKDAY_PATH As String = Sheets("Settings").Range(B5).Value
+Const DOCSTAR_PATH As String = Sheets("Settings").Range(B8).Value
+Const DOCSTARBROGAN_PATH As String = Sheets("Settings").Range(B11).Value
 
-' ********* ADD CUSTOM TEMPLATE COLUMN NAMES *********
-Private Const COLUMN_NAME1 As String = "Doc number"
-Private Const COLUMN2 As String = "PO number"
-Private Const COLUMN3 As String = "Date"
-Private Const COLUMN4 As String = "Workday status"
-Private Const COLUMN5 As String = "Docstar Workflow Step"
-Private Const COLUMN5 As String = "Amount match (Y/N)"
-Private Const COLUMN6 As String = "Notes"
+' FILE NAMES
+Const WORKDAY_NAME As String = Sheets("Settings").Range(B4).Value
+Const DOCSTAR_NAME As String = Sheets("Settings").Range(B7).Value
+Const DOCSTARBROGAN_NAME As String = Sheets("Settings").Range(B10).Value
+
+' CUSTOM TEMPLATE COLUMN NAMES
+Const INV_NUMBER As String = "Doc number"
+Const PO_NUMBER As String = "PO number"
+Const INV_DATE As String = "Date"
+Const WD_STATUS As String = "Workday status"
+Const DOCSTAR_WFS As String = "Docstar Workflow Step"
+Const AMOUNT_MATCH As String = "Amount match (Y/N)"
+Const NOTES As String = "Notes"
+
+
 
 Sub ImportDocstarGuillevin()
     ActiveWorkbook.Queries.Add Name:="DCSTR", Formula:= _
-        "let" & vbCrLf & _
-        "    Source = Csv.Document(File.Contents(""" & DOCSTAR & """), [Delimiter="","", Columns=15, Encoding=1252, QuoteStyle=QuoteStyle.None])," & vbCrLf & _
-        "    #""Promoted Headers"" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])," & vbCrLf & _
-        "    #""Changed Type"" = Table.TransformColumnTypes(#""Promoted Headers"", { " & vbCrLf & _
-        "        {""Document Link"", type text}, " & vbCrLf & _
-        "        {""VendorName"", type text}, " & vbCrLf & _
-        "        {""Title"", type text}, " & vbCrLf & _
-        "        {""VendorID"", Int64.Type}, " & vbCrLf & _
-        "        {""InvoiceNum"", type text}, " & vbCrLf & _
-        "        {""InvoiceDate"", type date}, " & vbCrLf & _
-        "        {""InvoiceAmt"", Currency.Type}, " & vbCrLf & _
-        "        {""PONum"", type text}, " & vbCrLf & _
-        "        {""Branch"", type text}, " & vbCrLf & _
-        "        {""Workflow Step"", type text}, " & vbCrLf & _
-        "        {""VoucherNumber"", Int64.Type}, " & vbCrLf & _
-        "        {""Modified On"", type datetime}, " & vbCrLf & _
-        "        {""Created On"", type datetime}, " & vbCrLf & _
-        "        {""Annotation Text"", type text}, " & vbCrLf & _
-        "        {""Workflow Name"", type text} " & vbCrLf & _
-        "    })" & vbCrLf & _
-        "in" & vbCrLf & _
+        "let" & _
+        "    Source = Csv.Document(File.Contents(""" & DOCSTAR & """), [Delimiter="","", Columns=15, Encoding=1252, QuoteStyle=QuoteStyle.None])," & _
+        "    #""Promoted Headers"" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])," & _
+        "    #""Changed Type"" = Table.TransformColumnTypes(#""Promoted Headers"", { " & _
+        "        {""Document Link"", type text}, " & _
+        "        {""VendorName"", type text}, " & _
+        "        {""Title"", type text}, " & _
+        "        {""VendorID"", Int64.Type}, " & _
+        "        {""InvoiceNum"", type text}, " & _
+        "        {""InvoiceDate"", type date}, " & _
+        "        {""InvoiceAmt"", Currency.Type}, " & _
+        "        {""PONum"", type text}, " & _
+        "        {""Branch"", type text}, " & _
+        "        {""Workflow Step"", type text}, " & _
+        "        {""VoucherNumber"", Int64.Type}, " & _
+        "        {""Modified On"", type datetime}, " & _
+        "        {""Created On"", type datetime}, " & _
+        "        {""Annotation Text"", type text}, " & _
+        "        {""Workflow Name"", type text} " & _
+        "    })" & _
+        "in" & _
         "    #""Changed Type"""
     With ActiveSheet.ListObjects.Add(SourceType:=0, Source:= _
         "OLEDB;Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=DCSTR;Extended Properties=""""" _
@@ -88,10 +95,10 @@ End Sub
 Sub ImportWorkday()
     Sheets("Workday").Select
     ActiveWorkbook.Queries.Add Name:="Rechercher des factures fournis", Formula:= _
-        "let" & vbCrLf & _
-        "    Source = Excel.Workbook(File.Contents(""" & WORKDAY & """), null, true)," & vbCrLf & _
-        "    #""Rechercher des factures fournis1"" = Source{[Name=""Rechercher des factures fournis""]}[Data]," & vbCrLf & _
-        "    #""Promoted Headers"" = Table.PromoteHeaders(#""Rechercher des factures fournis1"", [PromoteAllScalars=true])," & vbCrLf & _
+        "let" & _
+        "    Source = Excel.Workbook(File.Contents(""" & WORKDAY & """), null, true)," & _
+        "    #""Rechercher des factures fournis1"" = Source{[Name=""Rechercher des factures fournis""]}[Data]," & _
+        "    #""Promoted Headers"" = Table.PromoteHeaders(#""Rechercher des factures fournis1"", [PromoteAllScalars=true])," & _
         "    #""Changed Type"" = Table.TransformColumnTypes(#""Promoted Headers"", { " & _
         "{""Facture du fournisseur"", type text}, {""Nº de facture"", type text}, {""Société"", type text}, {""Cost Center ID"", type text}, " & _
         "{""Fournisseur"", type text}, {""Nº de facture du fournisseur"", type text}, {""Note"", Int64.Type}, {""Bons de commande"", type text}, " & _
@@ -102,8 +109,8 @@ Sub ImportWorkday()
         "{""Montant brut de la facture commerciale"", type number}, {""Solde dû"", type number}, {""Monnaie"", type text}, {""Intercompany"", type text}, " & _
         "{""Direct Intercompany"", type text}, {""En attente"", type text}, {""Ajustement"", type text}, {""Motif de l'ajustement"", type text}, " & _
         "{""Âge de la facture (en jours)"", Int64.Type}, {""Age des dettes (en jours)"", Int64.Type}, {""Supplier Category"", type text}, " & _
-        "{""Invoice Amount in Base Currency"", type number}, {""Facture créée par"", type text}, {""Moment de création"", type datetime} })" & vbCrLf & _
-        "in" & vbCrLf & _
+        "{""Invoice Amount in Base Currency"", type number}, {""Facture créée par"", type text}, {""Moment de création"", type datetime} })" & _
+        "in" & _
         "    #""Changed Type"""
 
     With ActiveSheet.ListObjects.Add(SourceType:=0, Source:= _
@@ -153,10 +160,10 @@ Sub ImportWorkday()
 End Sub
 Sub ImportDocstarBrogan()
     ActiveWorkbook.Queries.Add Name:="DCSTRBRGN", Formula:= _
-        "let" & vbCrLf & _
+        "let" & _
         "    Source = Csv.Document(File.Contents(""" & DOCSTARBROGAN & """), " & _
-        "[Delimiter="","", Columns=15, Encoding=1252, QuoteStyle=QuoteStyle.None])," & vbCrLf & _
-        "    #""Promoted Headers"" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])," & vbCrLf & _
+        "[Delimiter="","", Columns=15, Encoding=1252, QuoteStyle=QuoteStyle.None])," & _
+        "    #""Promoted Headers"" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])," & _
         "    #""Changed Type"" = Table.TransformColumnTypes(#""Promoted Headers"", { " & _
         "{""Document Link"", type text}, " & _
         "{""Title"", type text}, " & _
@@ -172,8 +179,8 @@ Sub ImportDocstarBrogan()
         "{""Created On"", type datetime}, " & _
         "{""Modified On"", type datetime}, " & _
         "{""Annotation Text"", type text}, " & _
-        "{""Workflow Name"", type text} })," & vbCrLf & _
-        "in" & vbCrLf & _
+        "{""Workflow Name"", type text} })," & _
+        "in" & _
         "    #""Changed Type"""
         
     With ActiveSheet.ListObjects.Add(SourceType:=0, Source:= _
@@ -222,6 +229,7 @@ Sub ImportDocstarBrogan()
     ActiveCell.FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6],DCSTRBRGN,3,FALSE),""Y"",""N"")"
     Range("G3").Select
 End Sub
+
 Sub UseBothDocstars()
     Range()
 
