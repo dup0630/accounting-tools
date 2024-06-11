@@ -1,0 +1,74 @@
+Sub ImportDocstarGuillevin()
+    Dim selectedFile As String
+    selectedFile = GetUserSelectedFile("Please select Docstar file:")
+    
+    ActiveWorkbook.Queries.Add Name:="DCSTR", Formula:= _
+        "let" & _
+        "    Source = Csv.Document(File.Contents(""" & DOCSTAR & """), [Delimiter="","", Columns=15, Encoding=1252, QuoteStyle=QuoteStyle.None])," & _
+        "    #""Promoted Headers"" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])," & _
+        "    #""Changed Type"" = Table.TransformColumnTypes(#""Promoted Headers"", { " & _
+        "        {""Document Link"", type text}, " & _
+        "        {""VendorName"", type text}, " & _
+        "        {""Title"", type text}, " & _
+        "        {""VendorID"", Int64.Type}, " & _
+        "        {""InvoiceNum"", type text}, " & _
+        "        {""InvoiceDate"", type date}, " & _
+        "        {""InvoiceAmt"", Currency.Type}, " & _
+        "        {""PONum"", type text}, " & _
+        "        {""Branch"", type text}, " & _
+        "        {""Workflow Step"", type text}, " & _
+        "        {""VoucherNumber"", Int64.Type}, " & _
+        "        {""Modified On"", type datetime}, " & _
+        "        {""Created On"", type datetime}, " & _
+        "        {""Annotation Text"", type text}, " & _
+        "        {""Workflow Name"", type text} " & _
+        "    })" & _
+        "in" & _
+        "    #""Changed Type"""
+    With ActiveSheet.ListObjects.Add(SourceType:=0, Source:= _
+        "OLEDB;Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=DCSTR;Extended Properties=""""" _
+        , Destination:=Range("$A$1")).QueryTable
+        .CommandType = xlCmdSql
+        .CommandText = Array("SELECT * FROM [DCSTR]")
+        .RowNumbers = False
+        .FillAdjacentFormulas = False
+        .PreserveFormatting = True
+        .RefreshOnFileOpen = False
+        .BackgroundQuery = True
+        .RefreshStyle = xlInsertDeleteCells
+        .SavePassword = False
+        .SaveData = True
+        .AdjustColumnWidth = True
+        .RefreshPeriod = 0
+        .PreserveColumnInfo = True
+        .ListObject.DisplayName = "DCSTR"
+        .Refresh BackgroundQuery:=False
+    End With
+
+    ' DELETE UNNECESSARY COLUMNS (DIFFERENT FOR EACH DATABASE!)
+    Columns("A:E").Select
+    Selection.Delete Shift:=xlToLeft
+    
+    ' CHANGE INVOICE NO INTO NUMBER TYPE WITH TEXT TO COLUMNS
+    Range("A:A").Select
+    Selection.TextToColumns Destination:=Range("A:A"), _
+        DataType:=xlDelimited, _
+        TextQualifier:=xlDoubleQuote, _
+        ConsecutiveDelimiter:=False, _
+        Tab:=False, _
+        Semicolon:=False, _
+        Comma:=False, _
+        Space:=False, _
+        Other:=False, _
+        FieldInfo:=Array(1, 1), _
+        TrailingMinusNumbers:=True
+    
+    Sheets("Table").Select
+    
+    Range("TABLE[Docstar]").Select
+    ActiveCell.FormulaR1C1 = "=VLOOKUP(RC[-5], DCSTR, 5, FALSE)"
+    
+    Range("TABLE[Amount match]").Select
+    ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-3]=VLOOKUP(RC[-6], DCSTR,3,FALSE),""Y"",""N"")"
+End Sub
