@@ -33,12 +33,10 @@ Sub ImportWorkday()
     tbl.Name = "WD"
     
     ' DELETE UNNECESSARY COLUMNS (DIFFERENT FOR EACH DATABASE!)
-    ws.Columns("A:E").Select
-    Selection.Delete Shift:=xlToLeft
+    ws.Columns("A:E").Delete Shift:=xlToLeft
     
     ' CHANGE INVOICE NO INTO NUMBER TYPE WITH TEXT TO COLUMNS
-    ws.Range("A:A").Select
-    Selection.TextToColumns Destination:=Range("A:A"), _
+    ws.Range("A:A").TextToColumns Destination:=Range("A:A"), _
         DataType:=xlDelimited, _
         TextQualifier:=xlDoubleQuote, _
         ConsecutiveDelimiter:=False, _
