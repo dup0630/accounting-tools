@@ -1,8 +1,9 @@
-Sub ConvertXLSXtoCSV()
+Sub ImportWorkday()
     Dim xlsxFilePath As String
     Dim csvFilePath As String
     Dim wb As Workbook
     Dim qt As QueryTable
+    Dim ws As Worksheet
 
     ' CONVERT TO CSV
     xlsxFilePath = GetUserSelectedFile("Please select Workday data file:")
@@ -13,7 +14,8 @@ Sub ConvertXLSXtoCSV()
     wb.Close SaveChanges:=False
     
     ' IMPORT DATA
-    Set qt = Workday.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=Workday.Range("A1"))
+    Set ws = ThisWorkbook.Sheets("Workday")
+    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.Range("A1"))
     
     With qt
         .TextFileParseType = xlDelimited
@@ -25,8 +27,8 @@ Sub ConvertXLSXtoCSV()
     
     ' CONVERT DATA INTO TABLE
     Dim tbl As ListObject
-    Set tbl = Workday.ListObjects.Add(SourceType:=xlSrcRange, _
-                                 Source:=Workday.Range("A1").CurrentRegion, _
+    Set tbl = ws.ListObjects.Add(SourceType:=xlSrcRange, _
+                                 Source:=ws.Range("A1").CurrentRegion, _
                                  xlListObjectHasHeaders:=xlYes)
     tbl.Name = "WD"
     

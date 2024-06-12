@@ -1,10 +1,12 @@
 Sub ImportDocstarBrogan()
     Dim csvFilePath As String
     Dim qt As QueryTable
+    Dim ws As Worksheet
     
     ' IMPORT CSV
     csvFilePath = GetUserSelectedFile("Please select Docstar (Brogan) data file:")
-    Set qt = DocstarBrogan.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=DocstarBrogan.Range("A1"))
+    Set ws = ThisWorkbook.Sheets("Docstar Brogan")
+    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.Range("A1"))
     
     With qt
         .TextFileParseType = xlDelimited
@@ -16,8 +18,8 @@ Sub ImportDocstarBrogan()
     
     ' CREATE TABLE
     Dim tbl As ListObject
-    Set tbl = DocstarBrogan.ListObjects.Add(SourceType:=xlSrcRange, _
-                                 Source:=DocstarBrogan.Range("A1").CurrentRegion, _
+    Set tbl = ws.ListObjects.Add(SourceType:=xlSrcRange, _
+                                 Source:=ws.Range("A1").CurrentRegion, _
                                  xlListObjectHasHeaders:=xlYes)
     tbl.Name = "DCSTRBRGN"
     
