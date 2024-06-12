@@ -1,56 +1,33 @@
 Sub ImportDocstarBrogan()
-    Dim selectedFile As String
-    DOCSTARBROGAN = GetUserSelectedFile("Please select Docstar file:")
+    Dim ws As Worksheet
+    Dim csvFilePath As String
+    Dim qt As QueryTable
     
-    ActiveWorkbook.Queries.Add Name:="DCSTRBRGN", Formula:= _
-        "let" & _
-        "    Source = Csv.Document(File.Contents(""" & DOCSTARBROGAN & """), " & _
-        "[Delimiter="","", Columns=15, Encoding=1252, QuoteStyle=QuoteStyle.None])," & _
-        "    #""Promoted Headers"" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])," & _
-        "    #""Changed Type"" = Table.TransformColumnTypes(#""Promoted Headers"", { " & _
-        "{""Document Link"", type text}, " & _
-        "{""Title"", type text}, " & _
-        "{""VendorName"", type text}, " & _
-        "{""VendorID"", Int64.Type}, " & _
-        "{""InvoiceNum"", type text}, " & _
-        "{""InvoiceDate"", type date}, " & _
-        "{""InvoiceAmt"", Currency.Type}, " & _
-        "{""PONum"", Int64.Type}, " & _
-        "{""Branch"", type text}, " & _
-        "{""Workflow Step"", type text}, " & _
-        "{""VoucherNumber"", Int64.Type}, " & _
-        "{""Created On"", type datetime}, " & _
-        "{""Modified On"", type datetime}, " & _
-        "{""Annotation Text"", type text}, " & _
-        "{""Workflow Name"", type text} })," & _
-        "in" & _
-        "    #""Changed Type"""
-        
-    With ActiveSheet.ListObjects.Add(SourceType:=0, Source:= _
-        "OLEDB;Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=DCSTRBRGN;Extended Properties=""""" _
-        , Destination:=Range("$A$1")).QueryTable
-        .CommandType = xlCmdSql
-        .CommandText = Array("SELECT * FROM [DCSTRBRGN]")
-        .RowNumbers = False
-        .FillAdjacentFormulas = False
-        .PreserveFormatting = True
-        .RefreshOnFileOpen = False
-        .BackgroundQuery = True
-        .RefreshStyle = xlInsertDeleteCells
-        .SavePassword = False
-        .SaveData = True
-        .AdjustColumnWidth = True
-        .RefreshPeriod = 0
-        .PreserveColumnInfo = True
-        .ListObject.DisplayName = "DCSTRBRGN"
+    ' IMPORT CSV
+    csvFilePath = GetUserSelectedFile("Please select Docstar (Brogan) data file:")
+    Set ws = DocstarBrogan
+    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.Range("A1"))
+    
+    With qt
+        .TextFileParseType = xlDelimited
+        .TextFileCommaDelimiter = True
+        .TextFileColumnDataTypes = Array(1) ' Treat all columns as text
         .Refresh BackgroundQuery:=False
     End With
+    qt.Delete
+    
+    ' CREATE TABLE
+    Dim tbl As ListObject
+    Set tbl = ws.ListObjects.Add(SourceType:=xlSrcRange, _
+                                 Source:=ws.Range("A1").CurrentRegion, _
+                                 xlListObjectHasHeaders:=xlYes)
+    tbl.Name = "DCSTRBRGN"
     
     ' DELETE UNNECESSARY COLUMNS (DIFFERENT FOR EACH DATABASE!)
     Columns("A:D").Select
     Selection.Delete Shift:=xlToLeft
     
-    ' CHANGE INVOICE NO INTO NUMBER TYPE WITH TEXT TO COLUMNS
+    ' CHANGE INVOICE# INTO NUMBER TYPE WITH TEXT TO COLUMNS
     Range("A:A").Select
     Selection.TextToColumns Destination:=Range("A:A"), _
         DataType:=xlDelimited, _

@@ -1,13 +1,11 @@
-Option Explicit
-
-Public Function GetFile(ByVal promptMessage As String) As String
+Public Function GetUserSelectedFile(ByVal promptMessage As String) As String
     Dim filePath As Variant
     filePath = Application.GetOpenFilename("All Files,*.*", , promptMessage)
 
     If filePath <> False Then
-        GetFile = filePath
+        GetUserSelectedFile = filePath
     Else
-        GetFile = ""
+        GetUserSelectedFile = ""
     End If
 End Function
 

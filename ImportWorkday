@@ -1,49 +1,36 @@
-Sub ImportWorkday()
-    Dim selectedFile As String
-    WORKDAY = GetUserSelectedFile("Please select Docstar file:")
+Sub ConvertXLSXtoCSV()
+    Dim xlsxFilePath As String
+    Dim csvFilePath As String
+    Dim wb As Workbook
+    Dim ws As Worksheet
+    Dim qt As QueryTable
 
-    Sheets("Workday").Select
-    ActiveWorkbook.Queries.Add Name:="Rechercher des factures fournis", Formula:= _
-        "let" & _
-        "    Source = Excel.Workbook(File.Contents(""" & WORKDAY & """), null, true)," & _
-        "    #""Rechercher des factures fournis1"" = Source{[Name=""Rechercher des factures fournis""]}[Data]," & _
-        "    #""Promoted Headers"" = Table.PromoteHeaders(#""Rechercher des factures fournis1"", [PromoteAllScalars=true])," & _
-        "    #""Changed Type"" = Table.TransformColumnTypes(#""Promoted Headers"", { " & _
-        "{""Facture du fournisseur"", type text}, {""Nº de facture"", type text}, {""Société"", type text}, {""Cost Center ID"", type text}, " & _
-        "{""Fournisseur"", type text}, {""Nº de facture du fournisseur"", type text}, {""Note"", Int64.Type}, {""Bons de commande"", type text}, " & _
-        "{""Nº de bon de commande externe"", Int64.Type}, {""Date de la facture"", type date}, {""Accounting Date"", type date}, " & _
-        "{""Payment Status"", type text}, {""Settlement Number"", type text}, {""Payment Date"", type date}, {""Taxe seulement"", type text}, " & _
-        "{""Statut"", type text}, {""Date d'annulation"", type date}, {""Type de facture réglementaire"", type text}, {""Date d'échéance"", type date}, " & _
-        "{""Date de remise"", type date}, {""Montant de la facture"", type number}, {""Montant de l'escompte de la facture commerciale"", Int64.Type}, " & _
-        "{""Montant brut de la facture commerciale"", type number}, {""Solde dû"", type number}, {""Monnaie"", type text}, {""Intercompany"", type text}, " & _
-        "{""Direct Intercompany"", type text}, {""En attente"", type text}, {""Ajustement"", type text}, {""Motif de l'ajustement"", type text}, " & _
-        "{""Âge de la facture (en jours)"", Int64.Type}, {""Age des dettes (en jours)"", Int64.Type}, {""Supplier Category"", type text}, " & _
-        "{""Invoice Amount in Base Currency"", type number}, {""Facture créée par"", type text}, {""Moment de création"", type datetime} })" & _
-        "in" & _
-        "    #""Changed Type"""
+    ' CONVERT TO CSV
+    xlsxFilePath = GetUserSelectedFile("Please select Workday data file:")
+    csvFilePath = Left(xlsxFilePath, Len(xlsxFilePath) - 4) & "csv"
 
-    With ActiveSheet.ListObjects.Add(SourceType:=0, Source:= _
-        "OLEDB;Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=""Rechercher des factures fournis"";Extended Properties=""""" _
-        , Destination:=Range("$A$1")).QueryTable
-        .CommandType = xlCmdSql
-        .CommandText = Array("SELECT * FROM [Rechercher des factures fournis]")
-        .RowNumbers = False
-        .FillAdjacentFormulas = False
-        .PreserveFormatting = True
-        .RefreshOnFileOpen = False
-        .BackgroundQuery = True
-        .RefreshStyle = xlInsertDeleteCells
-        .SavePassword = False
-        .SaveData = True
-        .AdjustColumnWidth = True
-        .RefreshPeriod = 0
-        .PreserveColumnInfo = True
-        .ListObject.DisplayName = "Rechercher_des_factures_fournis"
+    Set wb = Workbooks.Open(xlsxFilePath)
+    wb.Sheets(1).SaveAs Filename:=csvFilePath, FileFormat:=xlCSV
+    wb.Close SaveChanges:=False
+    
+    ' IMPORT DATA
+    Set ws = Workday
+    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.Range("A1"))
+    
+    With qt
+        .TextFileParseType = xlDelimited
+        .TextFileCommaDelimiter = True
+        .TextFileColumnDataTypes = Array(1) ' Treat all columns as text
         .Refresh BackgroundQuery:=False
     End With
-
-    ' CHANGE TABLE NAME
-    ActiveSheet.ListObjects("Rechercher_des_factures_fournis").Name = "WD"
+    qt.Delete
+    
+    ' CONVERT DATA INTO TABLE
+    Dim tbl As ListObject
+    Set tbl = ws.ListObjects.Add(SourceType:=xlSrcRange, _
+                                 Source:=ws.Range("A1").CurrentRegion, _
+                                 xlListObjectHasHeaders:=xlYes)
+    tbl.Name = "WD"
     
     ' DELETE UNNECESSARY COLUMNS (DIFFERENT FOR EACH DATABASE!)
     Columns("A:E").Select
