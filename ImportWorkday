@@ -2,7 +2,6 @@ Sub ConvertXLSXtoCSV()
     Dim xlsxFilePath As String
     Dim csvFilePath As String
     Dim wb As Workbook
-    Dim ws As Worksheet
     Dim qt As QueryTable
 
     ' CONVERT TO CSV
@@ -14,8 +13,7 @@ Sub ConvertXLSXtoCSV()
     wb.Close SaveChanges:=False
     
     ' IMPORT DATA
-    Set ws = Workday
-    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.Range("A1"))
+    Set qt = Workday.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=Workday.Range("A1"))
     
     With qt
         .TextFileParseType = xlDelimited
@@ -27,8 +25,8 @@ Sub ConvertXLSXtoCSV()
     
     ' CONVERT DATA INTO TABLE
     Dim tbl As ListObject
-    Set tbl = ws.ListObjects.Add(SourceType:=xlSrcRange, _
-                                 Source:=ws.Range("A1").CurrentRegion, _
+    Set tbl = Workday.ListObjects.Add(SourceType:=xlSrcRange, _
+                                 Source:=Workday.Range("A1").CurrentRegion, _
                                  xlListObjectHasHeaders:=xlYes)
     tbl.Name = "WD"
     
@@ -51,6 +49,6 @@ Sub ConvertXLSXtoCSV()
         TrailingMinusNumbers:=True
     
     Sheets("Table").Select
-    Range("TABLE[Workday]").Select
+    Range("E2").Select
     ActiveCell.FormulaR1C1 = "=VLOOKUP(RC[-4],WD,7,FALSE)"
 End Sub
