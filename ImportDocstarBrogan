@@ -24,11 +24,11 @@ Sub ImportDocstarBrogan()
     tbl.Name = "DCSTRBRGN"
     
     ' DELETE UNNECESSARY COLUMNS (DIFFERENT FOR EACH DATABASE!)
-    Columns("A:D").Select
+    ws.Columns("A:D").Select
     Selection.Delete Shift:=xlToLeft
     
     ' CHANGE INVOICE# INTO NUMBER TYPE WITH TEXT TO COLUMNS
-    Range("A:A").Select
+    ws.Range("A:A").Select
     Selection.TextToColumns Destination:=Range("A:A"), _
         DataType:=xlDelimited, _
         TextQualifier:=xlDoubleQuote, _
@@ -41,11 +41,7 @@ Sub ImportDocstarBrogan()
         FieldInfo:=Array(1, 1), _
         TrailingMinusNumbers:=True
         
-    Sheets("Table").Select
-    Range("F2").Select
-    ActiveCell.FormulaR1C1 = "=VLOOKUP(RC[-5],DCSTRBRGN,6,FALSE)"
+    Sheets("Table").Range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5],DCSTRBRGN,6,FALSE)"
     
-    Range("G2").Select
-    ActiveCell.FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6],DCSTRBRGN,3,FALSE),""Y"",""N"")"
-    Range("G3").Select
+    Sheets("Table").Range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6],DCSTRBRGN,3,FALSE),""Y"",""N"")"
 End Sub
