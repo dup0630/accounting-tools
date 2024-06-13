@@ -6,8 +6,8 @@ Sub ImportDocstar()
     Dim DocstarColumns As Variant
     Dim tbl As ListObject
 
-    tbl.Name = "NAME" ' ************ ENTER TABLE NAME
-    Set ws = ThisWorkbook.Sheets("SHEET") ' ************** ENTER SHEET NAME
+    tbl.Name = "DCSTRDUBO" ' ************ ENTER TABLE NAME
+    Set ws = ThisWorkbook.Sheets("Docstar Dubo") ' ************** ENTER SHEET NAME
     
     DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step", "Étape du flux de travail", "Ã‰tape du flux de travail")
 

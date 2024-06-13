@@ -1,33 +1,49 @@
-Sub ImportDocstarBrogan()
+Sub ImportDocstar()
     Dim csvFilePath As String
     Dim qt As QueryTable
     Dim ws As Worksheet
+    Dim colNamesToDelete As Collection
+    Dim DocstarColumns As Variant
+    Dim tbl As ListObject
+
+    tbl.Name = "DCSTRBRGN" ' ************ ENTER TABLE NAME
+    Set ws = ThisWorkbook.Sheets("Docstar Brogan") ' ************** ENTER SHEET NAME
     
+    DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step", "Étape du flux de travail", "Ã‰tape du flux de travail")
+
     ' IMPORT CSV
-    csvFilePath = GetUserSelectedFile("Please select Docstar (Brogan) data file:")
-    Set ws = ThisWorkbook.Sheets("Docstar Brogan")
-    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.Range("A1"))
+    csvFilePath = GetUserSelectedFile("Please select Docstar data file:")
+    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.range("A1"))
     
     With qt
         .TextFileParseType = xlDelimited
         .TextFileCommaDelimiter = True
-        .TextFileColumnDataTypes = Array(1) ' Treat all columns as text
+        .TextFileColumnDataTypes = Array(1)
         .Refresh BackgroundQuery:=False
     End With
     qt.Delete
     
     ' CREATE TABLE
-    Dim tbl As ListObject
     Set tbl = ws.ListObjects.Add(SourceType:=xlSrcRange, _
-                                 Source:=ws.Range("A1").CurrentRegion, _
+                                 Source:=ws.range("A1").CurrentRegion, _
                                  xlListObjectHasHeaders:=xlYes)
-    tbl.Name = "DCSTRBRGN"
     
-    ' DELETE UNNECESSARY COLUMNS (DIFFERENT FOR EACH DATABASE!)
-    ws.Columns("A:D").Delete Shift:=xlToLeft
+    ' DELETE UNNECESSARY COLUMNS
+    Set colNamesToDelete = New Collection
+    
+    For Each col In tbl.ListColumns
+        colName = col.Name
+        If IsError(Application.Match(colName, DocstarColumns, 0)) Then
+            colNamesToDelete.Add colName
+        End If
+    Next col
+    For i = colNamesToDelete.Count To 1 Step -1
+        tbl.ListColumns(colNamesToDelete(i)).Delete
+    Next i
+    ws.Cells.ColumnWidth = 14
     
     ' CHANGE INVOICE# INTO NUMBER TYPE WITH TEXT TO COLUMNS
-    ws.Range("A:A").TextToColumns Destination:=Range("A:A"), _
+    ws.range("A:A").TextToColumns Destination:=range("A:A"), _
         DataType:=xlDelimited, _
         TextQualifier:=xlDoubleQuote, _
         ConsecutiveDelimiter:=False, _
@@ -38,8 +54,9 @@ Sub ImportDocstarBrogan()
         Other:=False, _
         FieldInfo:=Array(1, 1), _
         TrailingMinusNumbers:=True
-        
-    Sheets("Table").Range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5],DCSTRBRGN,6,FALSE)"
     
-    Sheets("Table").Range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6],DCSTRBRGN,3,FALSE),""Y"",""N"")"
+    Sheets("Table").range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5]," & tbl.name & ", 4, FALSE)"
+    
+    Sheets("Table").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.name & ",2,FALSE),""Y"",""N"")"
 End Sub
+
