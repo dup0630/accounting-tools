@@ -1,0 +1,56 @@
+Sub ImportDocstarGuillevin()
+    Dim csvFilePath As String
+    Dim qt As QueryTable
+    Dim ws As Worksheet
+    Dim colNamesToDelete As Collection
+
+    ' IMPORT CSV
+    csvFilePath = GetUserSelectedFile("Please select Docstar (Guillevin) data file:")
+    Set ws = ThisWorkbook.Sheets("Docstar Guillevin")
+    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.Range("A1"))
+    
+    With qt
+        .TextFileParseType = xlDelimited
+        .TextFileCommaDelimiter = True
+        .TextFileColumnDataTypes = Array(1) ' Treat all columns as text
+        .Refresh BackgroundQuery:=False
+    End With
+    qt.Delete
+    
+    ' CREATE TABLE
+    Dim tbl As ListObject
+    Set tbl = ws.ListObjects.Add(SourceType:=xlSrcRange, _
+                                 Source:=ws.Range("A1").CurrentRegion, _
+                                 xlListObjectHasHeaders:=xlYes)
+    tbl.Name = "DCSTR"
+    
+    ' DELETE UNNECESSARY COLUMNS (DIFFERENT FOR EACH DATABASE!)
+    Set colNamesToDelete = New Collection
+    
+    For Each col In tbl.ListColumns
+        colName = col.Name
+        If IsError(Application.Match(colName, DocstarColumns, 0)) Then
+            colNamesToDelete.Add colName
+        End If
+    Next col
+    For i = colNamesToDelete.Count To 1 Step -1
+        tbl.ListColumns(colNamesToDelete(i)).Delete
+    Next i
+    
+    ' CHANGE INVOICE# INTO NUMBER TYPE WITH TEXT TO COLUMNS
+    ws.Range("A:A").TextToColumns Destination:=Range("A:A"), _
+        DataType:=xlDelimited, _
+        TextQualifier:=xlDoubleQuote, _
+        ConsecutiveDelimiter:=False, _
+        Tab:=False, _
+        Semicolon:=False, _
+        Comma:=False, _
+        Space:=False, _
+        Other:=False, _
+        FieldInfo:=Array(1, 1), _
+        TrailingMinusNumbers:=True
+    
+    Sheets("Table").Range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5], DCSTR, 5, FALSE)"
+    
+    Sheets("Table").Range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], DCSTR,3,FALSE),""Y"",""N"")"
+End Sub

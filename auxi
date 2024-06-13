@@ -1,0 +1,33 @@
+Sub DeleteAllColumnsExceptSelected()
+    Dim ws As Worksheet
+    Dim tbl As ListObject
+    Dim selectedColumns As Variant
+    Dim col As ListColumn
+    Dim colName As String
+    Dim colNamesToDelete As Collection
+    Dim i As Long
+    
+    ' Set the worksheet and table where you want to delete columns
+    Set ws = ThisWorkbook.Sheets("Sheet1") ' Change "Sheet1" to your target sheet name
+    Set tbl = ws.ListObjects("Table1") ' Change "Table1" to your table name
+    
+    ' Specify the names of the columns you want to keep
+    selectedColumns = Array("Column1", "Column2") ' Change to your column names
+    
+    ' Create a collection to hold the names of columns to delete
+    Set colNamesToDelete = New Collection
+    
+    ' Loop through all columns in the table
+    Dim colName As String
+    For Each col In tbl.ListColumns
+        colName = col.Name
+        If IsError(Application.Match(colName, selectedColumns, 0)) Then
+            colNamesToDelete.Add colName
+        End If
+    Next col
+    
+    ' Loop through the collection of columns to delete and delete them
+    For i = colNamesToDelete.Count To 1 Step -1
+        tbl.ListColumns(colNamesToDelete(i)).Delete
+    Next i
+End Sub
