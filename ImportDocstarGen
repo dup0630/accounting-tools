@@ -5,8 +5,9 @@ Sub ImportDocstar()
     Dim colNamesToDelete As Collection
     Dim DocstarColumns As Variant
     Dim tbl As ListObject
+    Dim nm As String
 
-    tbl.Name = "NAME" ' ************ ENTER TABLE NAME
+    nm = "TABLE NAME" ' ***************** ENTER TABLE NAME
     Set ws = ThisWorkbook.Sheets("SHEET") ' ************** ENTER SHEET NAME
     
     DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step", "Étape du flux de travail", "Ã‰tape du flux de travail")
@@ -28,6 +29,7 @@ Sub ImportDocstar()
                                  Source:=ws.range("A1").CurrentRegion, _
                                  xlListObjectHasHeaders:=xlYes)
     
+    tbl.Name = nm
     ' DELETE UNNECESSARY COLUMNS
     Set colNamesToDelete = New Collection
     
@@ -55,8 +57,8 @@ Sub ImportDocstar()
         FieldInfo:=Array(1, 1), _
         TrailingMinusNumbers:=True
     
-    Sheets("Table").range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5]," & tbl.name & ", 4, FALSE)"
+    Sheets("Statement").range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5]," & tbl.name & ", 4, FALSE)"
     
-    Sheets("Table").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.name & ",2,FALSE),""Y"",""N"")"
+    Sheets("Statement").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.name & ",2,FALSE),""Y"",""N"")"
 End Sub
 

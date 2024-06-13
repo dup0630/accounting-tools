@@ -15,7 +15,7 @@ Sub ImportWorkday()
     
     ' IMPORT DATA
     Set ws = ThisWorkbook.Sheets("Workday")
-    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.Range("A1"))
+    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.range("A1"))
     
     With qt
         .TextFileParseType = xlDelimited
@@ -28,7 +28,7 @@ Sub ImportWorkday()
     ' CONVERT DATA INTO TABLE
     Dim tbl As ListObject
     Set tbl = ws.ListObjects.Add(SourceType:=xlSrcRange, _
-                                 Source:=ws.Range("A1").CurrentRegion, _
+                                 Source:=ws.range("A1").CurrentRegion, _
                                  xlListObjectHasHeaders:=xlYes)
     tbl.Name = "WD"
     
@@ -36,7 +36,7 @@ Sub ImportWorkday()
     ws.Columns("A:E").Delete Shift:=xlToLeft
     
     ' CHANGE INVOICE NO INTO NUMBER TYPE WITH TEXT TO COLUMNS
-    ws.Range("A:A").TextToColumns Destination:=Range("A:A"), _
+    ws.range("A:A").TextToColumns Destination:=range("A:A"), _
         DataType:=xlDelimited, _
         TextQualifier:=xlDoubleQuote, _
         ConsecutiveDelimiter:=False, _
@@ -48,5 +48,5 @@ Sub ImportWorkday()
         FieldInfo:=Array(1, 1), _
         TrailingMinusNumbers:=True
     
-    Sheets("Table").Range("E2").FormulaR1C1 = "=VLOOKUP(RC[-4],WD,7,FALSE)"
+    Sheets("Statement").range("E2").FormulaR1C1 = "=VLOOKUP(RC[-4],WD,7,FALSE)"
 End Sub

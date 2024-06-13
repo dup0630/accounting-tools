@@ -1,0 +1,20 @@
+Sub FixColumns()
+    Dim rng As String
+    cols = Array("A", "B", "C", "D")
+    
+    For i = 0 To 3
+        rng = cols(i) & ":" & cols(i)
+        Sheets("Statement").range(rng).TextToColumns Destination:=Sheets("Table").range(rng), _
+            DataType:=xlDelimited, _
+            TextQualifier:=xlDoubleQuote, _
+            ConsecutiveDelimiter:=False, _
+            Tab:=False, _
+            Semicolon:=False, _
+            Comma:=False, _
+            Space:=False, _
+            Other:=False, _
+            FieldInfo:=Array(1, 1), _
+            TrailingMinusNumbers:=True
+    Next i
+    MsgBox "Columns have been formatted."
+End Sub

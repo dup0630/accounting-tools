@@ -8,6 +8,3 @@ Public Function GetUserSelectedFile(ByVal promptMessage As String) As String
         GetUserSelectedFile = ""
     End If
 End Function
-
-Public DocstarColumns As Variant
-DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step")
