@@ -42,7 +42,7 @@ Sub ImportDocstar()
     For i = colNamesToDelete.Count To 1 Step -1
         tbl.ListColumns(colNamesToDelete(i)).Delete
     Next i
-    ws.Cells.ColumnWidth = 14
+    tbl.Range.Columns.AutoFit
     
     ' CHANGE INVOICE# INTO NUMBER TYPE WITH TEXT TO COLUMNS
     ws.range("A:A").TextToColumns Destination:=range("A:A"), _

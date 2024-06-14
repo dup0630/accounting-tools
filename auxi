@@ -31,3 +31,35 @@ Sub DeleteAllColumnsExceptSelected()
         tbl.ListColumns(colNamesToDelete(i)).Delete
     Next i
 End Sub
+
+Sub RearrangeColumns()
+    Dim ws As Worksheet
+    Dim tbl As ListObject
+    Dim colOrder As Variant
+    Dim colName As String
+    Dim colIndex As Long
+    Dim i As Long
+    
+    ' Set the worksheet and table
+    Set ws = ThisWorkbook.Sheets("Sheet1") ' Change to your sheet name
+    Set tbl = ws.ListObjects("MyTable") ' Change to your table name
+    
+    ' Define the desired column order
+    colOrder = Array("Column1", "Column2", "Column3") ' Change to your desired order
+    
+    ' Loop through the desired order and move the columns
+    For i = LBound(colOrder) To UBound(colOrder)
+        colName = colOrder(i)
+        colIndex = tbl.ListColumns(colName).Index
+        
+        ' Move the column to the desired position
+        If colIndex <> i + 1 Then
+            tbl.ListColumns(colName).Range.Cut
+            tbl.ListColumns(i + 1).Range.Insert Shift:=xlToRight
+        End If
+    Next i
+    
+    ' Optional: AutoFit the columns after rearranging
+    tbl.Range.Columns.AutoFit
+End Sub
+

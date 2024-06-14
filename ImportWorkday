@@ -31,7 +31,8 @@ Sub ImportWorkday()
                                  Source:=ws.range("A1").CurrentRegion, _
                                  xlListObjectHasHeaders:=xlYes)
     tbl.Name = "WD"
-    
+    tbl.Range.Columns.AutoFit
+
     ' DELETE UNNECESSARY COLUMNS (DIFFERENT FOR EACH DATABASE!)
     ws.Columns("A:E").Delete Shift:=xlToLeft
     
