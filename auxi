@@ -35,21 +35,14 @@ End Sub
 Sub RearrangeColumns()
     Dim ws As Worksheet
     Dim tbl As ListObject
-    Dim colOrder As Variant
+    Dim DocstrarColumns As Variant
     Dim colName As String
     Dim colIndex As Long
     Dim i As Long
     
-    ' Set the worksheet and table
-    Set ws = ThisWorkbook.Sheets("Sheet1") ' Change to your sheet name
-    Set tbl = ws.ListObjects("MyTable") ' Change to your table name
-    
-    ' Define the desired column order
-    colOrder = Array("Column1", "Column2", "Column3") ' Change to your desired order
-    
     ' Loop through the desired order and move the columns
-    For i = LBound(colOrder) To UBound(colOrder)
-        colName = colOrder(i)
+    For i = LBound(DocstarColumns) To UBound(DocstarColumns)
+        colName = DocstarColumns(i)
         colIndex = tbl.ListColumns(colName).Index
         
         ' Move the column to the desired position
@@ -62,4 +55,22 @@ Sub RearrangeColumns()
     ' Optional: AutoFit the columns after rearranging
     tbl.Range.Columns.AutoFit
 End Sub
+
+Private Sub ComboBox1_Change()
+    Dim dcstr_lang As String
+    dcstr_lang = ComboBox1.Value
+    
+    If dcstr_lang = "ENGLISH" Then
+        DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step")
+    ElseIf dcstr_lang = "FRANÇAIS" Then
+        DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Ã‰tape du flux de travail")
+    Else
+        ' Handle unexpected value
+        MsgBox "Please select a language for Docstar.", vbCritical, "Error"
+        Exit Sub
+    End If
+End Sub
+
+
+ws.Cells.ColumnWidth = 14
 
