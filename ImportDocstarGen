@@ -1,4 +1,4 @@
-Sub ImportDocstar()
+Sub ImportDocstarGuillevin()
     Dim csvFilePath As String
     Dim qt As QueryTable
     Dim ws As Worksheet
@@ -13,17 +13,17 @@ Sub ImportDocstar()
     
     ' CHECK DOCSTAR SELECTED LANGUAGE
     If dcstr_lang = "ENGLISH" Then
-        DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step")
+        DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step", "InvoiceDate", "Branch", "Annotation Text")
     ElseIf dcstr_lang = "FRANÇAIS" Then
-        DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Ã‰tape du flux de travail")
+        DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Ã‰tape du flux de travail", "InvoiceDate", "Branch", "Texte de l'annotation")
     Else
         ' Handle unexpected value
         MsgBox "Please select a language for Docstar.", vbCritical, "Error"
         Exit Sub
     End If
 
-    nm = "TABLE NAME" ' ***************** ENTER TABLE NAME
-    Set ws = ThisWorkbook.Sheets("SHEET") ' ************** ENTER SHEET NAME
+    nm = "DCSTR" ' ***************** ENTER TABLE NAME
+    Set ws = ThisWorkbook.Sheets("Docstar Guillevin") ' ************** ENTER SHEET NAME
 
     ' IMPORT CSV
     csvFilePath = GetUserSelectedFile("Please select Docstar data file:")
@@ -44,16 +44,20 @@ Sub ImportDocstar()
     
     tbl.Name = nm
      ' REARRANGE COLUMNS
+    On Error GoTo ErrorHandler
+    
     For i = LBound(DocstarColumns) To UBound(DocstarColumns)
         colName = DocstarColumns(i)
         colIndex = tbl.ListColumns(colName).Index
         
         ' Move the column to the desired position
         If colIndex <> i + 1 Then
-            tbl.ListColumns(colName).Range.Cut
-            tbl.ListColumns(i + 1).Range.Insert Shift:=xlToRight
+            tbl.ListColumns(colName).range.Cut
+            tbl.ListColumns(i + 1).range.Insert Shift:=xlToRight
         End If
     Next i
+    
+    
     
     ' DELETE UNNECESSARY COLUMNS
     Set colNamesToDelete = New Collection
@@ -67,7 +71,7 @@ Sub ImportDocstar()
     For i = colNamesToDelete.Count To 1 Step -1
         tbl.ListColumns(colNamesToDelete(i)).Delete
     Next i
-    tbl.Range.Columns.AutoFit
+    tbl.range.Columns.AutoFit
     
     ' CHANGE INVOICE# INTO NUMBER TYPE WITH TEXT TO COLUMNS
     ws.range("A:A").TextToColumns Destination:=range("A:A"), _
@@ -82,8 +86,17 @@ Sub ImportDocstar()
         FieldInfo:=Array(1, 1), _
         TrailingMinusNumbers:=True
     
-    Sheets("Statement").range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5]," & tbl.name & ", 4, FALSE)"
+    Sheets("Statement").range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5]," & tbl.Name & ", 4, FALSE)"
     
-    Sheets("Statement").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.name & ",2,FALSE),""Y"",""N"")"
+    Sheets("Statement").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.Name & ",2,FALSE),""Y"",""N"")"
+    
+    On Error GoTo 0
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "Error: Wrong language selected. " & Err.Description, vbExclamation
+    On Error GoTo 0
 End Sub
+
+
 
