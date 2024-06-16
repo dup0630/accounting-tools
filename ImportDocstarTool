@@ -1,4 +1,4 @@
-Sub ImportDocstarTool(ByVal nm As String, ByRef ws As Worksheet)
+Sub ImportDocstarTool(nm As String, wsnm As String)
     Dim csvFilePath As String
     Dim qt As QueryTable
     Dim colName As String
@@ -9,9 +9,9 @@ Sub ImportDocstarTool(ByVal nm As String, ByRef ws As Worksheet)
     Dim dcstr_lang As String
     dcstr_lang = ThisWorkbook.Sheets("Statement").ComboBox1.Value
     Dim ws As Worksheet
-    Dim nm As String
 
-    ' CHECK DOCSTAR fSELECTED LANGUAGE
+
+    ' CHECK DOCSTAR SELECTED LANGUAGE
     If dcstr_lang = "ENGLISH" Then
         DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step", "InvoiceDate", "Branch", "Annotation Text")
     ElseIf dcstr_lang = "FRANÇAIS" Then
@@ -23,6 +23,8 @@ Sub ImportDocstarTool(ByVal nm As String, ByRef ws As Worksheet)
     End If
 
     ' IMPORT CSV
+    Set ws = ThisWorkbook.Sheets(wsnm)
+    ws.Cells.Delete
     csvFilePath = GetUserSelectedFile("Please select Docstar data file:")
     Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.range("A1"))
     
