@@ -1,0 +1,7 @@
+Sub ImportDocstarGuillevin()
+    nm = "DCSTR" ' ***************** ENTER TABLE NAME
+    Set ws = ThisWorkbook.Sheets("Docstar Guillevin") ' ************** ENTER SHEET NAME
+    ws.Cells.Delete
+
+    Call ImportDocstarTool(nm, ws)
+End Sub

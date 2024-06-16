@@ -20,10 +20,11 @@ Sub ImportWorkday()
     With qt
         .TextFileParseType = xlDelimited
         .TextFileCommaDelimiter = True
-        .TextFileColumnDataTypes = Array(1) ' Treat all columns as text
+        .TextFileColumnDataTypes = Array(1)
         .Refresh BackgroundQuery:=False
     End With
     qt.Delete
+    Kill csvFilePath
     
     ' CONVERT DATA INTO TABLE
     Dim tbl As ListObject

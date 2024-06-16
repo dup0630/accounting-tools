@@ -11,7 +11,7 @@ Sub ImportDocstarGuillevin()
     Dim dcstr_lang As String
     dcstr_lang = ThisWorkbook.Sheets("Statement").ComboBox1.Value
     
-    ' CHECK DOCSTAR SELECTED LANGUAGE
+    ' CHECK DOCSTAR fSELECTED LANGUAGE
     If dcstr_lang = "ENGLISH" Then
         DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step", "InvoiceDate", "Branch", "Annotation Text")
     ElseIf dcstr_lang = "FRANÇAIS" Then
@@ -24,6 +24,7 @@ Sub ImportDocstarGuillevin()
 
     nm = "DCSTR" ' ***************** ENTER TABLE NAME
     Set ws = ThisWorkbook.Sheets("Docstar Guillevin") ' ************** ENTER SHEET NAME
+    ws.Cells.Delete
 
     ' IMPORT CSV
     csvFilePath = GetUserSelectedFile("Please select Docstar data file:")
