@@ -87,7 +87,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
         TrailingMinusNumbers:=True
 
     ' CHANCE AMOUNT INTO NUMBERS ONLY(REMOVE $)
-    amount_col = tbl.ListColumns("InvAmt").DataBodyRange
+    Set amount_col = tbl.ListColumns("InvoiceAmt").DataBodyRange
     For Each cell In amount_col
         If cell.Value <> "" Then cell.Value = ExtractNumber(cell.Value)
     Next cell
