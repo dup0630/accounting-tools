@@ -9,6 +9,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     Dim dcstr_lang As String
     dcstr_lang = ThisWorkbook.Sheets("Statement").ComboBox1.Value
     Dim ws As Worksheet
+    Dim amount_col As Range
 
 
     ' CHECK DOCSTAR SELECTED LANGUAGE
@@ -84,6 +85,12 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
         Other:=False, _
         FieldInfo:=Array(1, 1), _
         TrailingMinusNumbers:=True
+
+    ' CHANCE AMOUNT INTO NUMBERS ONLY(REMOVE $)
+    amount_col = tbl.ListColumns("InvAmt").DataBodyRange
+    For Each cell In amount_col
+        If cell.Value <> "" Then cell.Value = ExtractNumber(cell.Value)
+    Next cell
     
     Sheets("Statement").range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5]," & tbl.Name & ", 4, FALSE)"
     
