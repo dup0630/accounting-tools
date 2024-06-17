@@ -91,7 +91,8 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     For Each cell In amount_col
         If cell.Value <> "" Then cell.Value = ExtractNumber(cell.Value)
     Next cell
-    
+
+    ' ENTER FORMULAS
     Sheets("Statement").range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5]," & tbl.Name & ", 4, FALSE)"
     
     Sheets("Statement").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.Name & ",2,FALSE),""Y"",""N"")"
