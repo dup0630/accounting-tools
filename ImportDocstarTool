@@ -43,9 +43,9 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
                                  xlListObjectHasHeaders:=xlYes)
     
     tbl.Name = nm
+
      ' REARRANGE COLUMNS
-    On Error GoTo ErrorHandler
-    
+    On Error GoTo LangErrorHandler
     For i = LBound(DocstarColumns) To UBound(DocstarColumns)
         colName = DocstarColumns(i)
         colIndex = tbl.ListColumns(colName).Index
@@ -97,12 +97,12 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     
     Sheets("Statement").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.Name & ",2,FALSE),""Y"",""N"")"
     
-    On Error GoTo 0
     Exit Sub
     
-ErrorHandler:
-    MsgBox "Error: Wrong language selected. Please click on Clear and try again.", vbExclamation
-    On Error GoTo 0
+LangErrorHandler:
+    MsgBox "Error: Wrong language selected. Please try again.", vbExclamation
+    ws.Cells.Delete
+    Exit Sub
 End Sub
 
 
