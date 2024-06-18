@@ -101,7 +101,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     Exit Sub
     
 ErrorHandler:
-    MsgBox "Error: Wrong language selected. " & Err.Description, vbExclamation
+    MsgBox "Error: Wrong language selected. Please click on Clear and try again.", vbExclamation
     On Error GoTo 0
 End Sub
 
