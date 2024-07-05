@@ -7,7 +7,7 @@ def extract_attachments(msg_file_path, output_folder):
     attachments = msg.attachments
     n = 1
     for attachment in attachments:
-        attachment_path = os.path.join(output_folder, attachment.longFilename)
+        attachment_path = os.path.join(output_folder, attachment.longFilename, str(n))
         with open(attachment_path, 'wb') as file:
             file.write(attachment.data)
         print(f"Extracted: {attachment.longFilename}")
