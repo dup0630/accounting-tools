@@ -1,4 +1,0 @@
-Sub MergeGuillevinBrogan()
-    Sheets("Statement").range("F2").FormulaR1C1 = "=IFNA(VLOOKUP(RC[-5],DCSTR, 4, FALSE), IFNA(VLOOKUP(RC[-5],DCSTRBRGN, 4, FALSE), VLOOKUP(RC[-5],DCSTRDUBO, 4, FALSE)))"
-    Sheets("Statement").range("G2").FormulaR1C1 = "=IFNA(IF(RC[-3]=VLOOKUP(RC[-6], DCSTR,2,FALSE),""Y"",""N""), IFNA(IF(RC[-3]=VLOOKUP(RC[-6], DCSTRBRGN,2,FALSE),""Y"",""N""), IF(RC[-3]=VLOOKUP(RC[-6], DCSTRDUBO,2,FALSE),""Y"",""N"")))"
-End Sub

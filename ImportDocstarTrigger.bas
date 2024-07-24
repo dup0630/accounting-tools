@@ -3,6 +3,7 @@ Sub ImportDocstarGuillevin()
     Dim worksheet_name As String 
     table_name = "DCSTR"
     worksheet_name = "Docstar Guillevin"
+    ClearGuillevin()
     ImportDocstarTool table_name, worksheet_name
 End Sub
 Sub ImportDocstarBrogan()
@@ -10,6 +11,7 @@ Sub ImportDocstarBrogan()
     Dim worksheet_name As String 
     table_name = "DCSTRBRGN"
     worksheet_name = "Docstar Brogan"
+    CleariBrogan()
     ImportDocstarTool table_name, worksheet_name
 End Sub
 Sub ImportDocstarDubo()
@@ -17,5 +19,6 @@ Sub ImportDocstarDubo()
     Dim worksheet_name As String 
     table_name = "DCSTRDUBO"
     worksheet_name = "Docstar Dubo"
+    ClearDubo()
     ImportDocstarTool table_name, worksheet_name
 End Sub
