@@ -7,12 +7,18 @@ Sub ImportWorkday()
 
     Set ws = ThisWorkbook.Sheets("Workday")
     If ws.Range("A2") <> "" Then
-        input = MsgBox "This action will overwrite the previous data. Are you sure you want to continue", vbYesNo
+        response = MsgBox ("This action will overwrite the previous data. Are you sure you want to continue?", vbYesNo + vbQuestion, "Guillevin International Inc.")
+        If response = vbNo Then
+            Exit Sub
+        End If
     End If
 
-    ws.Cells.Delete
     ' CONVERT TO CSV
     xlsxFilePath = GetUserSelectedFile("Please select Workday data file:")
+    If xlsxFilePath = "" Then
+        MsgBox "No file selected."
+        Exit Sub
+    End If
     csvFilePath = Left(xlsxFilePath, Len(xlsxFilePath) - 4) & "csv"
 
     Set wb = Workbooks.Open(xlsxFilePath)
@@ -20,6 +26,7 @@ Sub ImportWorkday()
     wb.Close SaveChanges:=False
     
     ' IMPORT DATA
+    ws.Cells.Delete
     Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.range("A1"))
     
     With qt
