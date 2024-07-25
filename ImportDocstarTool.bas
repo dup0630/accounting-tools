@@ -27,6 +27,10 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     Set ws = ThisWorkbook.Sheets(wsnm)
     ws.Cells.Delete
     csvFilePath = GetUserSelectedFile("Please select Docstar data file:")
+    If csvFilePath = "" Then
+        MsgBox "No file selected."
+        Exit Sub
+    End If
     Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.range("A1"))
     
     With qt
