@@ -110,6 +110,3 @@ LangErrorHandler:
     ws.Cells.Delete
     Exit Sub
 End Sub
-
-
-
