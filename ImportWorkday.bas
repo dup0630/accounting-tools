@@ -62,5 +62,6 @@ Sub ImportWorkday()
         FieldInfo:=Array(1, 1), _
         TrailingMinusNumbers:=True
     
-    Sheets("Statement").range("E2").FormulaR1C1 = "=VLOOKUP(RC[-4],WD,7,FALSE)"
+    Sheets("Statement").ListObjects("TABLE").ListColumns("Workday Status").DataBodyRange.Formula = "=VLOOKUP([@[Inv. number]],WD,7,FALSE)"
+    ' Sheets("Statement").range("E2").FormulaR1C1 = "=VLOOKUP(RC[-4],WD,7,FALSE)"
 End Sub
