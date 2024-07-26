@@ -18,7 +18,7 @@ Sub MergeGuillevinBrogan()
     For i = 1 To 3
         Set ws = ThisWorkbook.Worksheets(SheetNames(i))
         For Each tbl In ws.ListObjects
-            If Table.Name = TableNames(i) Then
+            If tbl.Name = TableNames(i) Then
                 TableExists(i) = True
             End If
         Next tbl
