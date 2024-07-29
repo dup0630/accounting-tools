@@ -1,4 +1,5 @@
 Sub ImportDocstarTool(nm As String, wsnm As String)
+    Dim filePath As String
     Dim csvFilePath As String
     Dim qt As QueryTable
     Dim colName As String
@@ -7,39 +8,68 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     Dim DocstarColumns As Variant
     Dim tbl As ListObject
     Dim dcstr_lang As String
-    dcstr_lang = ThisWorkbook.Sheets("Statement").ComboBox1.Value
     Dim ws As Worksheet
     Dim amount_col As Range
+    Dim wb As Workbook
 
 
     ' CHECK DOCSTAR SELECTED LANGUAGE
-    If dcstr_lang = "ENGLISH" Then
-        DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step", "InvoiceDate", "Branch", "Annotation Text")
-    ElseIf dcstr_lang = "FRANÇAIS" Then
-        DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Ã‰tape du flux de travail", "InvoiceDate", "Branch", "Texte de l'annotation")
-    Else
-        ' Handle unexpected value
-        MsgBox "Please select a language for Docstar.", vbCritical, "Error"
-        Exit Sub
-    End If
+    dcstr_lang = ThisWorkbook.Sheets("Statement").ComboBox1.Value
 
-    ' IMPORT CSV
+    ' IMPORT FILE
     Set ws = ThisWorkbook.Sheets(wsnm)
     ws.Cells.Delete
-    csvFilePath = GetUserSelectedFile("Please select Docstar data file:")
-    If csvFilePath = "" Then
+    filePath = GetUserSelectedFile("Please select Docstar data file:")
+    If filePath = "" Then
         MsgBox "No file selected."
         Exit Sub
     End If
-    Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.range("A1"))
-    
-    With qt
-        .TextFileParseType = xlDelimited
-        .TextFileCommaDelimiter = True
-        .TextFileColumnDataTypes = Array(1)
-        .Refresh BackgroundQuery:=False
-    End With
-    qt.Delete
+
+    If Right$(filePath, 5) = ".xlsx" Then
+        DocstarColumns = ("InvoiceAmount", "WorkflowStep", "InvoiceNumber" )
+        ' CREATE CSV COPY
+        csvFilePath = Left(filePath, Len(filePath) - 4) & "csv"
+        Set wb = Workbooks.Open(filePath)
+        ' REMOVE UNNECESSARY DATA
+        wb.Sheets(1).Rows("1:3").Delete Shift:=xlUp
+        wb.Sheets(1).SaveAs Filename:=csvFilePath, FileFormat:=xlCSV
+
+        wb.Close SaveChanges:=False
+
+        ' IMPORT CSV
+        ws.Cells.Delete
+        Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.range("A1"))
+        With qt
+            .TextFileParseType = xlDelimited
+            .TextFileCommaDelimiter = True
+            .TextFileColumnDataTypes = Array(1)
+            .Refresh BackgroundQuery:=False
+        End With
+        qt.Delete
+        Kill csvFilePath
+    ElseIf Right$(filePath, 4) = ".csv" Then
+        ' LANGUAGE SETTINGS
+        If dcstr_lang = "ENGLISH" Then
+            DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step", "InvoiceDate", "Branch", "Annotation Text")
+        ElseIf dcstr_lang = "FRANÇAIS" Then
+            DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Ã‰tape du flux de travail", "InvoiceDate", "Branch", "Texte de l'annotation")
+        Else
+            ' Handle unexpected value
+            MsgBox "Please select a language for Docstar.", vbCritical, "Error"
+            Exit Sub
+        End If
+
+        ' IMPORT CSV
+        ws.Cells.Delete
+        Set qt = ws.QueryTables.Add(Connection:="TEXT;" & filePath, Destination:=ws.range("A1"))
+        With qt
+            .TextFileParseType = xlDelimited
+            .TextFileCommaDelimiter = True
+            .TextFileColumnDataTypes = Array(1)
+            .Refresh BackgroundQuery:=False
+        End With
+        qt.Delete
+    End If
     
     ' CREATE TABLE
     Set tbl = ws.ListObjects.Add(SourceType:=xlSrcRange, _
@@ -47,8 +77,18 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
                                  xlListObjectHasHeaders:=xlYes)
     
     tbl.Name = nm
+    ' REARRANGE COLUMNS 2
+    For i = LBound(DocstarColumns) To UBound(DocstarColumns)
+        colName = DocstarColumns(i)
+        colIndex = tbl.ListColumns(colName).Index
+        If colIndex > 1 Then
+            tbl.ListColumns(colName).range.Cut
+            tbl.ListColumns(1).range.Insert Shift:=xlToRight
+            Application.CutCopyMode = False
+        End If
 
-     ' REARRANGE COLUMNS
+
+    ' REARRANGE COLUMNS
     On Error GoTo LangErrorHandler
     For i = LBound(DocstarColumns) To UBound(DocstarColumns)
         colName = DocstarColumns(i)
@@ -58,6 +98,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
         If colIndex <> i + 1 Then
             tbl.ListColumns(colName).range.Cut
             tbl.ListColumns(i + 1).range.Insert Shift:=xlToRight
+            Application.CutCopyMode = False
         End If
     Next i
     
