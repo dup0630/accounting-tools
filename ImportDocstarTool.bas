@@ -26,7 +26,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     End If
 
     If Right$(filePath, 5) = ".xlsx" Then
-        DocstarColumns = ("InvoiceAmount", "WorkflowStep", "InvoiceNumber" )
+        DocstarColumns = ("InvoiceAmount", "WorkflowStep", "InvoiceNumber")
         ' CREATE CSV COPY
         csvFilePath = Left(filePath, Len(filePath) - 4) & "csv"
         Set wb = Workbooks.Open(filePath)
@@ -50,9 +50,9 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     ElseIf Right$(filePath, 4) = ".csv" Then
         ' LANGUAGE SETTINGS
         If dcstr_lang = "ENGLISH" Then
-            DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Workflow Step", "InvoiceDate", "Branch", "Annotation Text")
+            DocstarColumns = Array("InvoiceAmt", "Workflow Step", "InvoiceNum")
         ElseIf dcstr_lang = "FRANÇAIS" Then
-            DocstarColumns = Array("InvoiceNum", "InvoiceAmt", "PONum", "Ã‰tape du flux de travail", "InvoiceDate", "Branch", "Texte de l'annotation")
+            DocstarColumns = Array("InvoiceAmt", "Ã‰tape du flux de travail", "InvoiceNum")
         Else
             ' Handle unexpected value
             MsgBox "Please select a language for Docstar.", vbCritical, "Error"
@@ -78,6 +78,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     
     tbl.Name = nm
     ' REARRANGE COLUMNS 2
+    On Error GoTo LangErrorHandler
     For i = LBound(DocstarColumns) To UBound(DocstarColumns)
         colName = DocstarColumns(i)
         colIndex = tbl.ListColumns(colName).Index
@@ -86,35 +87,6 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
             tbl.ListColumns(1).range.Insert Shift:=xlToRight
             Application.CutCopyMode = False
         End If
-
-
-    ' REARRANGE COLUMNS
-    On Error GoTo LangErrorHandler
-    For i = LBound(DocstarColumns) To UBound(DocstarColumns)
-        colName = DocstarColumns(i)
-        colIndex = tbl.ListColumns(colName).Index
-        
-        ' Move the column to the desired position
-        If colIndex <> i + 1 Then
-            tbl.ListColumns(colName).range.Cut
-            tbl.ListColumns(i + 1).range.Insert Shift:=xlToRight
-            Application.CutCopyMode = False
-        End If
-    Next i
-    
-    
-    
-    ' DELETE UNNECESSARY COLUMNS
-    Set colNamesToDelete = New Collection
-    
-    For Each col In tbl.ListColumns
-        colName = col.Name
-        If IsError(Application.Match(colName, DocstarColumns, 0)) Then
-            colNamesToDelete.Add colName
-        End If
-    Next col
-    For i = colNamesToDelete.Count To 1 Step -1
-        tbl.ListColumns(colNamesToDelete(i)).Delete
     Next i
     tbl.range.Columns.AutoFit
     
@@ -131,17 +103,17 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
         FieldInfo:=Array(1, 1), _
         TrailingMinusNumbers:=True
 
-    ' CHANCE AMOUNT INTO NUMBERS ONLY(REMOVE $)
-    Set amount_col = tbl.ListColumns("InvoiceAmt").DataBodyRange
+    ' CHANgE AMOUNT INTO NUMBERS ONLY(REMOVE $)
+    Set amount_col = tbl.ListColumns(3).DataBodyRange
     For Each cell In amount_col
         If cell.Value <> "" Then cell.Value = ExtractNumber(cell.Value)
     Next cell
 
     ' ENTER FORMULAS
-    Sheets("Statement").ListObjects("TABLE").ListColumns("Docstar WF Step").DataBodyRange.Formula = "=VLOOKUP([@[Inv. number]]," & tbl.Name & ", 4, FALSE)"
+    Sheets("Statement").ListObjects("TABLE").ListColumns("Docstar WF Step").DataBodyRange.Formula = "=VLOOKUP([@[Inv. number]]," & tbl.Name & ", 2, FALSE)"
     ' Sheets("Statement").range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5]," & tbl.Name & ", 4, FALSE)"
     
-    Sheets("Statement").ListObjects("TABLE").ListColumns("Amount match (Y/N)").DataBodyRange.Formula = "=IF([@Amount]=VLOOKUP([@[Inv. number]], " & tbl.Name & ",2,FALSE),""Y"",""N"")"
+    Sheets("Statement").ListObjects("TABLE").ListColumns("Amount match (Y/N)").DataBodyRange.Formula = "=IF([@Amount]=VLOOKUP([@[Inv. number]], " & tbl.Name & ",3,FALSE),""Y"",""N"")"
     ' Sheets("Statement").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.Name & ",2,FALSE),""Y"",""N"")"
     
     Exit Sub

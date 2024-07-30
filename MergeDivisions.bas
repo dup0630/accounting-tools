@@ -34,8 +34,8 @@ Sub MergeGuillevinBrogan()
         End If
     Next j
 
-    Sheets("Statement").range("F2").FormulaR1C1 = "=IFNA(VLOOKUP(RC[-5],DCSTR, 4, FALSE), IFNA(VLOOKUP(RC[-5],DCSTRBRGN, 4, FALSE), VLOOKUP(RC[-5],DCSTRDUBO, 4, FALSE)))"
-    Sheets("Statement").range("G2").FormulaR1C1 = "=IFNA(IF(RC[-3]=VLOOKUP(RC[-6], DCSTR,2,FALSE),""Y"",""N""), IFNA(IF(RC[-3]=VLOOKUP(RC[-6], DCSTRBRGN,2,FALSE),""Y"",""N""), IF(RC[-3]=VLOOKUP(RC[-6], DCSTRDUBO,2,FALSE),""Y"",""N"")))"
+    ' ENTER FORMULAS
+    Sheets("Statement").ListObjects("TABLE").ListColumns("Docstar WF Step").DataBodyRange.Formula = "=IFNA(VLOOKUP([@[Inv. number]],DCSTR, 2, FALSE), IFNA(VLOOKUP([@[Inv. number]],DCSTRBRGN, 2, FALSE), VLOOKUP([@[Inv. number]],DCSTRDUBO, 2, FALSE)))"
+    Sheets("Statement").ListObjects("TABLE").ListColumns("Amount match (Y/N)").DataBodyRange.Formula = "=IFNA(IF([@Amount]=VLOOKUP([@[Inv. number]], DCSTR,2,FALSE),""Y"",""N""), IFNA(IF([@Amount]=VLOOKUP([@[Inv. number]], DCSTRBRGN,2,FALSE),""Y"",""N""), IF([@Amount]=VLOOKUP([@[Inv. number]], DCSTRDUBO,2,FALSE),""Y"",""N"")))"
+
 End Sub
-
-
