@@ -14,7 +14,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
 
 
     ' CHECK DOCSTAR SELECTED LANGUAGE
-    dcstr_lang = ThisWorkbook.Sheets("Statement").ComboBox1.Value
+    dcstr_lang = Sheet1.ComboBox1.Value
 
     ' IMPORT FILE
     Set ws = ThisWorkbook.Sheets(wsnm)
@@ -26,7 +26,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     End If
 
     If Right$(filePath, 5) = ".xlsx" Then
-        DocstarColumns = ("InvoiceAmount", "WorkflowStep", "InvoiceNumber")
+        DocstarColumns = Array("InvoiceAmount", "WorkflowStep", "InvoiceNumber")
         ' CREATE CSV COPY
         csvFilePath = Left(filePath, Len(filePath) - 4) & "csv"
         Set wb = Workbooks.Open(filePath)
@@ -110,10 +110,10 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     Next cell
 
     ' ENTER FORMULAS
-    Sheets("Statement").ListObjects("TABLE").ListColumns("Docstar WF Step").DataBodyRange.Formula = "=VLOOKUP([@[Inv. number]]," & tbl.Name & ", 2, FALSE)"
+    Sheet1.ListObjects("TABLE").ListColumns("Docstar WF Step").DataBodyRange.Formula = "=VLOOKUP([@[Inv. number]]," & tbl.Name & ", 2, FALSE)"
     ' Sheets("Statement").range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5]," & tbl.Name & ", 4, FALSE)"
-    
-    Sheets("Statement").ListObjects("TABLE").ListColumns("Amount match (Y/N)").DataBodyRange.Formula = "=IF([@Amount]=VLOOKUP([@[Inv. number]], " & tbl.Name & ",3,FALSE),""Y"",""N"")"
+    ' AMOUNT MATCH FORMULA (CANCELLED)
+    ' Sheets("Statement").ListObjects("TABLE").ListColumns("Amount match (Y/N)").DataBodyRange.Formula = "=IF([@Amount]=VLOOKUP([@[Inv. number]], " & tbl.Name & ",3,FALSE),""Y"",""N"")"
     ' Sheets("Statement").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.Name & ",2,FALSE),""Y"",""N"")"
     
     Exit Sub
