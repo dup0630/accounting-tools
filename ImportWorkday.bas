@@ -22,7 +22,7 @@ Sub ImportWorkday()
     csvFilePath = Left(xlsxFilePath, Len(xlsxFilePath) - 4) & "csv"
 
     Set wb = Workbooks.Open(xlsxFilePath)
-    If wb.Sheets(1).Range("A1").Value = "Rechercher des factures fournisseurs" Or wb.Range("A1").Value = "Find Supplier Invoices" Then
+    If wb.Sheets(1).Range("A1").Value = "Rechercher des factures fournisseurs" Or wb.Sheets(1).Range("A1").Value = "Find Supplier Invoices" Then
         wb.Sheets(1).Rows("1:29").Delete Shift:=xlUp
     End If
     wb.Sheets(1).SaveAs Filename:=csvFilePath, FileFormat:=xlCSV
@@ -68,5 +68,5 @@ Sub ImportWorkday()
     ' Sheet1.range("E2").FormulaR1C1 = "=VLOOKUP(RC[-4],WD,7,FALSE)"
     Sheet1.ListObjects("TABLE").ListColumns("Workday Status").DataBodyRange.Formula = "=VLOOKUP([@[Inv. number]],WD,7,FALSE)"
     Sheet1.ListObjects("TABLE").ListColumns("Workday Amount").DataBodyRange.Formula = "=VLOOKUP([@[Inv. number]],WD,16,FALSE)"
-    Sheet1.ListObjects("TABLE").ListColumns("Workday Date").DataBodyRange.Formula = "=IF(VLOOKUP([@[Inv. number]],WD,9,FALSE)=0,"""",VLOOKUP([@[Inv. number]],WD,9,FALSE))"
+    Sheet1.ListObjects("TABLE").ListColumns("Payment Date").DataBodyRange.Formula = "=IF(VLOOKUP([@[Inv. number]],WD,9,FALSE)=0,"""",VLOOKUP([@[Inv. number]],WD,9,FALSE))"
 End Sub

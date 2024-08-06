@@ -20,7 +20,6 @@ Sub ClearGuillevin()
     If response = vbYes Then
         ws.Cells.Delete
         Sheet1.ListObjects("TABLE").ListColumns("Docstar WF Step").DataBodyRange.ClearContents
-        Sheet1.ListObjects("TABLE").ListColumns("Amount match (Y/N)").DataBodyRange.ClearContents
     Else
         Exit Sub
     End If
@@ -33,7 +32,6 @@ Sub ClearBrogan()
     If response = vbYes Then
         ws.Cells.Delete
         Sheet1.ListObjects("TABLE").ListColumns("Docstar WF Step").DataBodyRange.ClearContents
-        Sheet1.ListObjects("TABLE").ListColumns("Amount match (Y/N)").DataBodyRange.ClearContents
     Else
         Exit Sub
     End If
@@ -46,7 +44,6 @@ Sub ClearDubo()
     If response = vbYes Then
         ws.Cells.Delete
         Sheet1.ListObjects("TABLE").ListColumns("Docstar WF Step").DataBodyRange.ClearContents
-        Sheet1.ListObjects("TABLE").ListColumns("Amount match (Y/N)").DataBodyRange.ClearContents
     Else
         Exit Sub
     End If
