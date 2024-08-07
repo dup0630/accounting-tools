@@ -102,12 +102,13 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
         Other:=False, _
         FieldInfo:=Array(1, 1), _
         TrailingMinusNumbers:=True
-
+        
+    ' After v1.6, the amount column is no longer used
     ' CHANgE AMOUNT INTO NUMBERS ONLY(REMOVE $)
-    Set amount_col = tbl.ListColumns(3).DataBodyRange
-    For Each cell In amount_col
-        If cell.Value <> "" Then cell.Value = ExtractNumber(cell.Value)
-    Next cell
+    'Set amount_col = tbl.ListColumns(3).DataBodyRange
+    'For Each cell In amount_col
+    '    If cell.Value <> "" Then cell.Value = ExtractNumber(cell.Value)
+    'Next cell
 
     ' ENTER FORMULAS
     Sheet1.ListObjects("TABLE").ListColumns("Docstar WF Step").DataBodyRange.Formula = "=VLOOKUP([@[Inv. number]]," & tbl.Name & ", 2, FALSE)"
