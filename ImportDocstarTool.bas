@@ -22,6 +22,15 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     filePath = GetUserSelectedFile("Please select Docstar data file:")
     If filePath = "" Then
         MsgBox "No file selected."
+        If ws.Name <> "Docstar1" Then
+            Application.DisplayAlerts = False
+            ws.Delete
+            Application.DisplayAlerts = True
+        End If
+        
+        n = ThisWorkbook.Sheets("Config").Range("B3").Value
+        ThisWorkbook.Sheets("Config").Range("B3").Value = n - 1
+        
         Exit Sub
     End If
 
@@ -38,7 +47,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
 
         ' IMPORT CSV
         ws.Cells.Delete
-        Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.range("A1"))
+        Set qt = ws.QueryTables.Add(Connection:="TEXT;" & csvFilePath, Destination:=ws.Range("A1"))
         With qt
             .TextFileParseType = xlDelimited
             .TextFileCommaDelimiter = True
@@ -61,7 +70,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
 
         ' IMPORT CSV
         ws.Cells.Delete
-        Set qt = ws.QueryTables.Add(Connection:="TEXT;" & filePath, Destination:=ws.range("A1"))
+        Set qt = ws.QueryTables.Add(Connection:="TEXT;" & filePath, Destination:=ws.Range("A1"))
         With qt
             .TextFileParseType = xlDelimited
             .TextFileCommaDelimiter = True
@@ -73,7 +82,7 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     
     ' CREATE TABLE
     Set tbl = ws.ListObjects.Add(SourceType:=xlSrcRange, _
-                                 Source:=ws.range("A1").CurrentRegion, _
+                                 Source:=ws.Range("A1").CurrentRegion, _
                                  xlListObjectHasHeaders:=xlYes)
     
     tbl.Name = nm
@@ -83,15 +92,15 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
         colName = DocstarColumns(i)
         colIndex = tbl.ListColumns(colName).Index
         If colIndex > 1 Then
-            tbl.ListColumns(colName).range.Cut
-            tbl.ListColumns(1).range.Insert Shift:=xlToRight
+            tbl.ListColumns(colName).Range.Cut
+            tbl.ListColumns(1).Range.Insert Shift:=xlToRight
             Application.CutCopyMode = False
         End If
     Next i
-    tbl.range.Columns.AutoFit
+    tbl.Range.Columns.AutoFit
     
     ' CHANGE INVOICE# INTO NUMBER TYPE WITH TEXT TO COLUMNS
-    ws.range("A:A").TextToColumns Destination:=range("A:A"), _
+    ws.Range("A:A").TextToColumns Destination:=Range("A:A"), _
         DataType:=xlDelimited, _
         TextQualifier:=xlDoubleQuote, _
         ConsecutiveDelimiter:=False, _
@@ -118,6 +127,10 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
     ' Sheets("Statement").ListObjects("TABLE").ListColumns("Amount match (Y/N)").DataBodyRange.Formula = "=IF([@Amount]=VLOOKUP([@[Inv. number]], " & tbl.Name & ",3,FALSE),""Y"",""N"")"
     ' Sheets("Statement").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.Name & ",2,FALSE),""Y"",""N"")"
     
+    If Sheets("Config").Range("B4").Value = False Then
+        Sheets("Config").Range("B4").Value = True
+    End If
+    
     Exit Sub
     
 LangErrorHandler:
@@ -125,3 +138,4 @@ LangErrorHandler:
     ws.Cells.Delete
     Exit Sub
 End Sub
+
