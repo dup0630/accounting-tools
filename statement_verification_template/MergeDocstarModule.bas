@@ -10,7 +10,7 @@ Sub MergeDocstar()
     
     n = ThisWorkbook.Sheets("Config").Range("B3").Value
     If n = 0 Then
-        MsgBox "Data has not been imported yet.", vbExclamation, "Guillevin International Inc."
+        MsgBox "Data has not been imported yet.", vbExclamation, "Company name"
         Exit Sub
     End If
     
@@ -63,7 +63,7 @@ Sub MergeDocstar()
     
     Sheet1.Activate
     Application.CutCopyMode = False ' Clear clipboard
-    MsgBox "Merge completed.", vbInformation, "Guillevin International Inc."
+    MsgBox "Merge completed.", vbInformation, "Company name"
     
     Exit Sub
     

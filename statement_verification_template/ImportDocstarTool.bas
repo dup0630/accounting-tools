@@ -112,20 +112,10 @@ Sub ImportDocstarTool(nm As String, wsnm As String)
         FieldInfo:=Array(1, 1), _
         TrailingMinusNumbers:=True
         
-    ' After v1.6, the amount column is no longer used
-    ' CHANgE AMOUNT INTO NUMBERS ONLY(REMOVE $)
-    'Set amount_col = tbl.ListColumns(3).DataBodyRange
-    'For Each cell In amount_col
-    '    If cell.Value <> "" Then cell.Value = ExtractNumber(cell.Value)
-    'Next cell
 
     ' ENTER FORMULAS
     Sheet1.ListObjects("TABLE").ListColumns("Docstar WF Step").DataBodyRange.Formula = "=VLOOKUP([@[Inv. number]]," & tbl.Name & ", 2, FALSE)"
     Sheet1.ListObjects("TABLE").ListColumns("Branch").DataBodyRange.Formula = "=VLOOKUP([@[Inv. number]]," & tbl.Name & ",3,FALSE)"
-    ' Sheets("Statement").range("F2").FormulaR1C1 = "=VLOOKUP(RC[-5]," & tbl.Name & ", 4, FALSE)"
-    ' AMOUNT MATCH FORMULA (CANCELLED)
-    ' Sheets("Statement").ListObjects("TABLE").ListColumns("Amount match (Y/N)").DataBodyRange.Formula = "=IF([@Amount]=VLOOKUP([@[Inv. number]], " & tbl.Name & ",3,FALSE),""Y"",""N"")"
-    ' Sheets("Statement").range("G2").FormulaR1C1 = "=IF(RC[-3]=VLOOKUP(RC[-6], " & tbl.Name & ",2,FALSE),""Y"",""N"")"
     
     If Sheets("Config").Range("B4").Value = False Then
         Sheets("Config").Range("B4").Value = True

@@ -9,7 +9,7 @@ Sub ImportWorkday()
 
     Set ws = ThisWorkbook.Sheets("Workday")
     If ws.Range("A2") <> "" Then
-        response = MsgBox("This action will overwrite the previous data. Are you sure you want to continue?", vbYesNo + vbQuestion, "Guillevin International Inc.")
+        response = MsgBox("This action will overwrite the previous data. Are you sure you want to continue?", vbYesNo + vbQuestion, "Company name")
         If response = vbNo Then
             Exit Sub
         End If

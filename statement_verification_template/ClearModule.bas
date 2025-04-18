@@ -4,12 +4,12 @@ Sub ClearWD()
     
     WorkdayContainsData = ThisWorkbook.Sheets("Config").Range("B5").Value
     If WorkdayContainsData = False Then
-        MsgBox "Nothing to clear.", vbExclamation, "Guillevin International Inc."
+        MsgBox "Nothing to clear.", vbExclamation, "Company Name."
         Exit Sub
     End If
     
     Set ws = ThisWorkbook.Sheets("Workday")
-    response = MsgBox("Do you want to clear the data in " & ws.Name & "?", vbYesNo + vbQuestion, "Guillevin International Inc.")
+    response = MsgBox("Do you want to clear the data in " & ws.Name & "?", vbYesNo + vbQuestion, "Company Name.")
     If response = vbYes Then
         ws.Cells.Delete
         Sheet1.ListObjects("TABLE").ListColumns("Workday Status").DataBodyRange.ClearContents
@@ -28,10 +28,10 @@ Sub ClearDS()
     Dim DocstarContainsData As Boolean
     DocstarContainsData = ThisWorkbook.Sheets("Config").Range("B4").Value
     If DocstarContainsData = False Then
-        MsgBox "Nothing to clear.", vbExclamation, "Guillevin International Inc."
+        MsgBox "Nothing to clear.", vbExclamation, "Company Name."
         Exit Sub
     End If
-    response = MsgBox("Do you want to clear the data in all Docstar worksheets?", vbYesNo + vbQuestion, "Guillevin International Inc.")
+    response = MsgBox("Do you want to clear the data in all Docstar worksheets?", vbYesNo + vbQuestion, "Company Name.")
     If response = vbYes Then
         ThisWorkbook.Sheets("Docstar1").Cells.Delete
         n = ThisWorkbook.Sheets("Config").Range("B3").Value
@@ -62,7 +62,7 @@ Sub ClearMerge()
     On Error GoTo NoMerge
     Set ws = ThisWorkbook.Sheets("MergedDocstarData")
     On Error GoTo 0
-    response = MsgBox("Do you want to clear the data in " & ws.Name & "? The remaining Docstar sheets will not be affected", vbYesNo + vbQuestion, "Guillevin International Inc.")
+    response = MsgBox("Do you want to clear the data in " & ws.Name & "? The remaining Docstar sheets will not be affected", vbYesNo + vbQuestion, "Company Name.")
     If response = vbYes Then
         Application.DisplayAlerts = False
         ws.Delete
